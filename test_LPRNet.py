@@ -30,9 +30,9 @@ def get_parser():
     parser.add_argument('--lpr_max_len', default=8, help='license plate number max length.')
     parser.add_argument('--test_batch_size', default=100, help='testing batch size.')
     parser.add_argument('--phase_train', default=False, type=bool, help='train or test phase flag.')
-    parser.add_argument('--num_workers', default=8, type=int, help='Number of workers used in dataloading')
+    parser.add_argument('--num_workers', default=1, type=int, help='Number of workers used in dataloading')
     parser.add_argument('--cuda', default=True, type=bool, help='Use cuda to train model')
-    parser.add_argument('--show', default=False, type=bool, help='show test image and its predict result or not.')
+    parser.add_argument('--show', default=True, type=bool, help='show test image and its predict result or not.')
     parser.add_argument('--pretrained_model', default='./weights/Final_LPRNet_model.pth', help='pretrained base model')
 
     args = parser.parse_args()
@@ -62,7 +62,7 @@ def test():
 
     # load pretrained model
     if args.pretrained_model:
-        lprnet.load_state_dict(torch.load(args.pretrained_model))
+        lprnet.load_state_dict(torch.load(args.pretrained_model,map_location=torch.device('cpu')))
         print("load pretrained model successful!")
     else:
         print("[Error] Can't found pretrained mode, please check!")
@@ -73,7 +73,8 @@ def test():
     try:
         Greedy_Decode_Eval(lprnet, test_dataset, args)
     finally:
-        print('cannot use Greedy_Decode_Eval!')
+        cv2.destroyAllWindows()
+        # print('cannot use Greedy_Decode_Eval!')
 
 def Greedy_Decode_Eval(Net, datasets, args):
     # TestNet = Net.eval()
